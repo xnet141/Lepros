@@ -54,6 +54,13 @@ post '/new' do
 	# получаем переменную из post-запроса
 	content = params[:content]
 
+	if content.length <= 0
+		@error = 'Typed post text'
+		return erb :new
+	end
+
+	@db.execute 'insert into Posts (content, created_date) values (?, datetime())', [content]
+
 	erb "You typed: #{content}"
 
 end
