@@ -32,6 +32,15 @@ configure do
 		created_date DATE,
 		content TEXT
 	)'
+
+	# создает таблицу если таблица не существует
+	@db.execute 'CREATE TABLE IF NOT EXISTS Comments 
+	(
+		id INTEGER PRIMARY KEY AUTOINCREMENT, 
+		created_date DATE,
+		content TEXT,
+		post_id integer
+	)'
 end
 
 
@@ -103,7 +112,24 @@ post '/details/:post_id' do
 	# получаем переменную из post-запроса
 	content = params[:content]
 
-	erb "You typed comment #{content} for post #{post_id}"
+	@db.execute 'insert into Comments 
+	(
+		content, 
+		created_date, 
+		post_id
+	) 
+		values
+	(
+		?, 
+		datetime(),
+		?
+	)', [content, post_id]
+
+
+	# перенаправляем на страницу поста
+	
+	redirect to ('/details/' + post_id)
+
 
 end
 
